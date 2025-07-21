@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
 import {CompatClient, Stomp} from "@stomp/stompjs";
 // @ts-ignore
@@ -28,7 +28,7 @@ export class AppComponent {
     this.stompClient = Stomp.over(socket);
     this.stompClient.connect({}, (frame: { command: string; }) => {
       if (frame.command === 'CONNECTED') {
-         let topic = "/topic/greetings";
+        let topic = "/topic/greetings";
         this.stompClientSubscription = this.stompClient.subscribe(topic, (alertJSON: any) => {
           const alert = JSON.parse(alertJSON.body);
           this.greeting = alert.name;
@@ -38,4 +38,45 @@ export class AppComponent {
     });
   }
 
+
+  getCarInfo(): Promise<CarInfo> {
+    return fetch('/api/car',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          make: 'BMW',
+          model: 'M3',
+        })
+      })
+      .then((res: Response) => {
+        if (!res.ok) throw new Error('Bad response');
+        return res.json(); // parses response body as JSON
+      })
+      .catch(err => {
+        alert('ERROR: ' + err.message); // shows user-friendly error
+        throw err; // rethrows the error for further handling
+      });
+  }
+
+  async getCarInfos(): Promise<CarInfo> {
+    try {
+      const res: Response = await fetch('/api/car', {method: 'GET'});
+      if (!res.ok) throw new Error('Bad response');
+      return await res.json();
+    } catch (err: any) {
+      alert('ERROR: ' + err.message);
+      throw err;
+    }
+  }
+
+
+}
+
+interface CarInfo {
+  id: number;
+  model: string;
+  isElectric: boolean;
 }
