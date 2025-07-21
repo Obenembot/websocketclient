@@ -24,7 +24,7 @@ export class AppComponent {
   private stompClientSubscription: Subscription = new Subscription();
 
   connect(): void {
-    const socket = new SockJS('http://localhost:8080/ws');
+    const socket = new SockJS('http://localhost:8081/ws');
     this.stompClient = Stomp.over(socket);
     this.stompClient.connect({}, (frame: { command: string; }) => {
       if (frame.command === 'CONNECTED') {
